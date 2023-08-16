@@ -1,10 +1,10 @@
 # Social Media
 
-[![Build](https://github.com/DmitriyZosimov/chatgpt-for-java-devs-course/tree/master/social-media/actions/workflows/build.yaml/badge.svg)](https://github.com/DmitriyZosimov/chatgpt-for-java-devs-course/tree/master/social-media/actions/workflows/build.yaml)
+[![Backend build](https://github.com/DmitriyZosimov/chatgpt-for-java-devs-course/actions/workflows/build.yaml/badge.svg)](https://github.com/DmitriyZosimov/chatgpt-for-java-devs-course/actions/workflows/build.yaml)
 <svg fill="none" viewBox="0 0 120 120" width="120" height="120" xmlns="http://www.w3.org/2000/svg">
    <foreignObject width="100%" height="100%">
       <div xmlns="http://www.w3.org/1999/xhtml">
-         <img alt="Coverage" src="https://github.com/DmitriyZosimov/chatgpt-for-java-devs-course/tree/master/social-media/.github/badges/coverage.svg"/>
+         <img alt="Coverage" src="https://github.com/DmitriyZosimov/chatgpt-for-java-devs-course/blob/master/.github/badges/task3-jr-coverage.svg"/>
       </div>
    </foreignObject>
 </svg>
