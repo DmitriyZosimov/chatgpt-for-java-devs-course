@@ -16,22 +16,21 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
           distribution: "corretto"
           java-version: ${{ env.JAVA_VERSION }}
 
-      - name: Run build
+      - name: Run build for task 3 (jr)
         run: |
+          cd social-media
           mvn package
 
-      - name: Upload catalog jacoco report for subsequent jobs
+      - name: Upload jacoco reports for subsequent jobs
         uses: actions/upload-artifact@v3
         with:
-          name: jacoco-report
+          name: task3-jacoco-report-jr
           retention-days: 1
           path: |
             **/target/site/jacoco/jacoco.csv
@@ -45,16 +44,16 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Download jacoco-report
+      - name: Download task3-jacoco-report-jr
         uses: actions/download-artifact@v3
         with:
-          name: jacoco-report
-      - name: Generate catalog code coverage
+          name: task3-jacoco-report-jr
+      - name: Generate code coverage
         uses: cicirello/jacoco-badge-generator@v2
         with:
-          jacoco-csv-file: ./target/site/jacoco/jacoco.csv
-          coverage-badge-filename: coverage.svg
-          coverage-label: "Coverage"
+          jacoco-csv-file: ./socialmedia/target/site/jacoco/jacoco.csv
+          coverage-badge-filename: task3-jr-coverage.svg
+          coverage-label: "Social media coverage"
       - name: Commit the badges
         run: |
           if [[ `git status --porcelain` ]]; then
