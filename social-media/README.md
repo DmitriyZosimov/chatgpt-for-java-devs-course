@@ -47,3 +47,26 @@ This is a simple social media application built using Spring Boot, Hibernate, an
    ```
 
 The application will start and listen on http://localhost:8080.
+
+## Feedback
+**1. Was it easy to complete the task using AI?**
+
+ChatGPT simplifies the process of creating basic classes. Also, it can assist in generating tests. 
+However, ChatGPT may produce errors, and the responses it provides should be carefully reviewed and controlled by the developer.
+
+**2. How long did task take you to complete?**
+
+I spent about 2.5-3 hours to complete this tasks.
+
+**3. Was the code ready to run after generation? What did you have to change to make it usable?**
+
+I did not change 80-90% of code  at all. I added my changes into domain (model) classes, configurations, tests and services.
+
+**4. Which challenges did you face during completion of the task?**
+
+For example, I regenerated the question several times so that chatgpt would provide me services with all implemented
+methods until I had an acceptable result.  
+
+**5. Which specific prompts you learned as a good practice to complete the task?**
+
+It's better to generate questions step-by-step to get comprehensive and correct results.
