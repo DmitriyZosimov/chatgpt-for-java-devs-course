@@ -1,0 +1,6 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+social-media-app,com.example.controller,UserController,6,37,2,2,2,11,2,4,0,4
+social-media-app,com.example.controller,PostController,6,37,2,2,2,11,2,4,0,4
+social-media-app,com.example.service,PostServiceImpl,0,55,2,2,0,12,2,4,0,4
+social-media-app,com.example.service,UserServiceImpl,0,52,2,2,0,11,2,4,0,4
+social-media-app,com.example.config,ApplicationConfig,0,72,0,0,0,18,0,4,0,4
