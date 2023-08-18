@@ -22,7 +22,7 @@ This is a simple social media application built using Spring Boot, Hibernate, an
 1. Clone the repository:
 
    ```sh
-   git clone https://github.com/yourusername/social-media-app.git
+   git clone https://github.com/DmitriyZosimov/chatgpt-for-java-devs-course.git
    ```
    
 2. Navigate to the project directory:
