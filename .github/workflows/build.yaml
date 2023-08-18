@@ -54,6 +54,12 @@ jobs:
           jacoco-csv-file: ./social-media/target/site/jacoco/jacoco.csv
           coverage-badge-filename: task3-jr-coverage.svg
           coverage-label: "Social media coverage"
+      - name: Generate bookstore code coverage
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          jacoco-csv-file: ./bookstore/target/site/jacoco/jacoco.csv
+          coverage-badge-filename: task1-md-coverage.svg
+          coverage-label: "Bookstore coverage"
       - name: Commit the badges
         run: |
           if [[ `git status --porcelain` ]]; then
