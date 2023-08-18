@@ -65,7 +65,7 @@ jobs:
       - name: Generate code coverage
         uses: cicirello/jacoco-badge-generator@v2
         with:
-          jacoco-csv-file: ./social-media/target/site/jacoco/jacoco.csv
+          jacoco-csv-file: social-media/social-media/target/site/jacoco/jacoco.csv
           coverage-badge-filename: task3-jr-coverage.svg
           coverage-label: "Social media coverage"
       - name: Download bookstore-jacoco-report
@@ -75,7 +75,7 @@ jobs:
       - name: Generate bookstore code coverage
         uses: cicirello/jacoco-badge-generator@v2
         with:
-          jacoco-csv-file: ./bookstore/target/site/jacoco/jacoco.csv
+          jacoco-csv-file: ./bookstore/bookstore/target/site/jacoco/jacoco.csv
           coverage-badge-filename: task1-md-coverage.svg
           coverage-label: "Bookstore coverage"
       - name: Commit the badges
