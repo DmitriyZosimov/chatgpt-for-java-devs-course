@@ -105,27 +105,27 @@ curl --request POST http://localhost:8080/bookstore/books --header "Content-Type
 
 4. Update a book by ID:
 ```bash
-curl -X PUT -H "Content-Type: application/json" -d '{"title":"Updated Book","price":15.99,"quantityAvailable":30}' http://localhost:8080/books/{bookId}
+curl -X PUT -H "Content-Type: application/json" -d '{"title":"Updated Book","price":15.99,"quantityAvailable":30}' http://localhost:8080/bookstore/books/{bookId}
 ```
 
 5. Delete a book by ID:
 ```bash
-curl -X DELETE http://localhost:8080/books/3
+curl -X DELETE http://localhost:8080/bookstore/books/3
 ```
 
 6. Search books by title:
 ```bash
-curl -X GET "http://localhost:8080/books/search?title=The%20Mystery%20Mansion"
+curl -X GET "http://localhost:8080/bookstore/books/search?title=The%20Mystery%20Mansion"
 ```
 
 7. Search books by author:
 ```bash
-curl -X GET "http://localhost:8080/books/search?author=Jane%20Doe"
+curl -X GET "http://localhost:8080/bookstore/books/search?author=Jane%20Doe"
 ```
 
 8. Search books by genre:
 ```bash
-curl -X GET "http://localhost:8080/books/search?genre=Fiction"
+curl -X GET "http://localhost:8080/bookstore/books/search?genre=Fiction"
 ```
 
 ## Feedback
