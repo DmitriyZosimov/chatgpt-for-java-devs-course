@@ -11,7 +11,7 @@ env:
 
 jobs:
   build:
-    name: Build-Social-Media
+    name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -33,12 +33,12 @@ jobs:
           name: social-media-jacoco-report
           retention-days: 1
           path: |
-            **/target/site/jacoco/jacoco.csv
+            social-media/target/site/jacoco/jacoco.csv
 
       # Bookstore
       - name: Run Bookstore build
         run: |
-          cd ../bookstore
+          cd bookstore
           mvn package
 
       - name: Upload bookstore jacoco reports for subsequent jobs
@@ -47,7 +47,7 @@ jobs:
           name: bookstore-jacoco-report
           retention-days: 1
           path: |
-            **/target/site/jacoco/jacoco.csv
+            bookstore/target/site/jacoco/jacoco.csv
 
   generateBadges:
     name: Generate badges
