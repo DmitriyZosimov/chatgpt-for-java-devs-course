@@ -102,5 +102,21 @@ Before you start, ensure you have the following prerequisites:
 ## Google Maps Integration
 The application integrates with Google Maps to provide directions to healthcare facilities. To use this feature, make sure you have configured your Google Maps API Key in application.properties as mentioned in the Prerequisites section.
 
+## Feedback
+**1. Was it easy to complete the task using AI?**
+
+Yes, ChatGPT helps quickly complete a lot of dreary job.
+
+**2. How long did task take you to complete?**
+
+I spent about 3-4 hours to complete this tasks.
+
+**3. Was the code ready to run after generation? What did you have to change to make it usable?**
+
+I added some methods and made a little cosmetic work.
+
+**4. Which challenges did you face during completion of the task?**
+
+If you update some part of a code, you will need to correct the following suggested answer regarding your changes.
 
 
