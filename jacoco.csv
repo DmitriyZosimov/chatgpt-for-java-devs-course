@@ -1,7 +1,9 @@
 GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-bookstore-api,com.example.controller,GenreController,0,57,0,4,0,17,0,8,0,6
-bookstore-api,com.example.controller,BookController,0,81,0,4,0,23,0,11,0,9
-bookstore-api,com.example.controller,AuthorController,0,57,0,4,0,17,0,8,0,6
-bookstore-api,com.example.service,GenreServiceImpl,0,55,0,2,0,14,0,7,0,6
-bookstore-api,com.example.service,AuthorServiceImpl,0,55,0,2,0,14,0,7,0,6
-bookstore-api,com.example.service,BookServiceImpl,0,82,0,2,0,20,0,10,0,9
+healthcare-mng,com.example.controller,PatientController,0,61,0,4,0,18,0,9,0,7
+healthcare-mng,com.example.controller,MedicationController,0,53,0,4,0,16,0,8,0,6
+healthcare-mng,com.example.controller,AppointmentController,0,53,0,4,0,16,0,8,0,6
+healthcare-mng,com.example.controller,DirectionsController,0,21,0,2,0,7,0,3,0,2
+healthcare-mng,com.example.service,PatientServiceImpl,0,78,0,4,0,21,0,9,0,7
+healthcare-mng,com.example.service,AppointmentServiceImpl,0,55,0,2,0,15,0,7,0,6
+healthcare-mng,com.example.service,GoogleMapsServiceImpl,0,34,0,2,0,10,0,3,0,2
+healthcare-mng,com.example.service,MedicationServiceImpl,0,48,0,2,0,13,0,7,0,6
