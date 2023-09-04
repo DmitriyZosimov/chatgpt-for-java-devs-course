@@ -1,0 +1,1507 @@
+** I:
+Develop a healthcare management system using Spring Boot and REST services. The application should allow healthcare providers to manage patient records, schedule appointments, and prescribe medication. The system should also integrate with a third-party service, such as Google Maps, to provide directions to healthcare facilities.
+
+Data model:
+Patient should contain id, firstName, lastName and prescribedMedications.
+Appointment should contain id, date, patient.
+Medication should contain id, name.
+
+** ChatGPT:
+Developing a complete healthcare management system is a complex task that involves various components and layers. Here, I'll provide you with a simplified outline of how you can approach building a healthcare management system using Spring Boot and REST services. This outline will cover the basic structure of the application, including data models, controllers, services, and integration with a third-party service like Google Maps.
+
+**1. Set Up the Project:**
+Start by creating a new Spring Boot project using your preferred IDE or Spring Initializr.
+
+**2. Define Data Models:**
+Create the necessary data models - `Patient`, `Appointment`, and `Medication`.
+
+```java
+@Entity
+public class Patient {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String firstName;
+    private String lastName;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    private List<Medication> prescribedMedications = new ArrayList<>();
+
+    // getters and setters
+}
+
+@Entity
+public class Appointment {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private LocalDate date;
+
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    private Patient patient;
+
+    // getters and setters
+}
+
+@Entity
+public class Medication {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+
+    // getters and setters
+}
+```
+
+**3. Create Repositories:**
+Create Spring Data JPA repositories for each data model to interact with the database.
+
+```java
+public interface PatientRepository extends JpaRepository<Patient, Long> {
+}
+
+public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+}
+
+public interface MedicationRepository extends JpaRepository<Medication, Long> {
+}
+```
+
+**4. Implement Services:**
+Create service classes to handle business logic and interact with the repositories.
+
+```java
+@Service
+public class PatientService {
+    @Autowired
+    private PatientRepository patientRepository;
+
+    // Implement methods for managing patient records
+}
+
+@Service
+public class AppointmentService {
+    @Autowired
+    private AppointmentRepository appointmentRepository;
+
+    // Implement methods for managing appointments
+}
+
+@Service
+public class MedicationService {
+    @Autowired
+    private MedicationRepository medicationRepository;
+
+    // Implement methods for managing medications
+}
+```
+
+**5. Create Controllers:**
+Build REST controllers to expose endpoints for managing patient records, appointments, and medications.
+
+```java
+@RestController
+@RequestMapping("/patients")
+public class PatientController {
+    @Autowired
+    private PatientService patientService;
+
+    // Implement REST endpoints for patient management
+}
+
+@RestController
+@RequestMapping("/appointments")
+public class AppointmentController {
+    @Autowired
+    private AppointmentService appointmentService;
+
+    // Implement REST endpoints for appointment management
+}
+
+@RestController
+@RequestMapping("/medications")
+public class MedicationController {
+    @Autowired
+    private MedicationService medicationService;
+
+    // Implement REST endpoints for medication management
+}
+```
+
+**6. Integrate Google Maps:**
+To integrate with Google Maps, you can use the Google Maps API. You'll need to sign up for an API key and use it to make requests for directions. This integration can be implemented within a service class or a separate utility class.
+
+**7. Security and Validation:**
+Implement authentication and authorization mechanisms to secure your application. Also, validate user input to ensure data integrity.
+
+**8. Error Handling:**
+Implement global exception handling to provide meaningful error responses to clients.
+
+Remember, this is a high-level outline, and there are many details to consider while implementing each component. Additionally, ensure that you follow best practices for code organization, testing, and deployment.
+
+** I:
+Provide me interfaces of services and their implementations.
+-  Implement all methods for this application.
+- PatientService should contain crud methods and method "addMedicationToPatient". - "addMedicationToPatient" method should get "Long patientId", "Long medicationId".
+- AppointmentService should contain CRUD methods.
+- MedicationService should contatin CRUD methods.
+- provide constructor injection
+
+** ChatGPT:
+Sure, here are the interfaces for the services along with their implementations:
+
+**1. PatientService Interface:**
+
+```java
+public interface PatientService {
+    List<Patient> getAllPatients();
+    Patient getPatientById(Long id);
+    Patient createPatient(Patient patient);
+    Patient updatePatient(Long id, Patient patient);
+    void deletePatient(Long id);
+    void addMedicationToPatient(Long patientId, Long medicationId);
+}
+```
+
+**2. AppointmentService Interface:**
+
+```java
+public interface AppointmentService {
+    List<Appointment> getAllAppointments();
+    Appointment getAppointmentById(Long id);
+    Appointment createAppointment(Appointment appointment);
+    Appointment updateAppointment(Long id, Appointment appointment);
+    void deleteAppointment(Long id);
+}
+```
+
+**3. MedicationService Interface:**
+
+```java
+public interface MedicationService {
+    List<Medication> getAllMedications();
+    Medication getMedicationById(Long id);
+    Medication createMedication(Medication medication);
+    Medication updateMedication(Long id, Medication medication);
+    void deleteMedication(Long id);
+}
+```
+
+**4. PatientServiceImpl:**
+
+```java
+@Service
+public class PatientServiceImpl implements PatientService {
+    private final PatientRepository patientRepository;
+    private final MedicationRepository medicationRepository;
+
+    @Autowired
+    public PatientServiceImpl(PatientRepository patientRepository, MedicationRepository medicationRepository) {
+        this.patientRepository = patientRepository;
+        this.medicationRepository = medicationRepository;
+    }
+
+    @Override
+    public List<Patient> getAllPatients() {
+        return patientRepository.findAll();
+    }
+
+    @Override
+    public Patient getPatientById(Long id) {
+        return patientRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Patient createPatient(Patient patient) {
+        return patientRepository.save(patient);
+    }
+
+    @Override
+    public Patient updatePatient(Long id, Patient patient) {
+        Patient existingPatient = getPatientById(id);
+        if (existingPatient != null) {
+            existingPatient.setFirstName(patient.getFirstName());
+            existingPatient.setLastName(patient.getLastName());
+            return patientRepository.save(existingPatient);
+        }
+        return null;
+    }
+
+    @Override
+    public void deletePatient(Long id) {
+        patientRepository.deleteById(id);
+    }
+
+    @Override
+    public void addMedicationToPatient(Long patientId, Long medicationId) {
+        Patient patient = getPatientById(patientId);
+        Medication medication = medicationRepository.findById(medicationId).orElse(null);
+
+        if (patient != null && medication != null) {
+            patient.getPrescribedMedications().add(medication);
+            patientRepository.save(patient);
+        }
+    }
+}
+```
+
+**5. AppointmentServiceImpl:**
+
+```java
+@Service
+public class AppointmentServiceImpl implements AppointmentService {
+    private final AppointmentRepository appointmentRepository;
+    private final PatientRepository patientRepository;
+
+    @Autowired
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, PatientRepository patientRepository) {
+        this.appointmentRepository = appointmentRepository;
+        this.patientRepository = patientRepository;
+    }
+
+    @Override
+    public List<Appointment> getAllAppointments() {
+        return appointmentRepository.findAll();
+    }
+
+    @Override
+    public Appointment getAppointmentById(Long id) {
+        return appointmentRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Appointment createAppointment(Appointment appointment) {
+        return appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public Appointment updateAppointment(Long id, Appointment appointment) {
+        Appointment existingAppointment = getAppointmentById(id);
+        if (existingAppointment != null) {
+            existingAppointment.setDate(appointment.getDate());
+            existingAppointment.setPatient(appointment.getPatient());
+            return appointmentRepository.save(existingAppointment);
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteAppointment(Long id) {
+        appointmentRepository.deleteById(id);
+    }
+}
+```
+
+**6. MedicationServiceImpl:**
+
+```java
+@Service
+public class MedicationServiceImpl implements MedicationService {
+    private final MedicationRepository medicationRepository;
+
+    @Autowired
+    public MedicationServiceImpl(MedicationRepository medicationRepository) {
+        this.medicationRepository = medicationRepository;
+    }
+
+    @Override
+    public List<Medication> getAllMedications() {
+        return medicationRepository.findAll();
+    }
+
+    @Override
+    public Medication getMedicationById(Long id) {
+        return medicationRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Medication createMedication(Medication medication) {
+        return medicationRepository.save(medication);
+    }
+
+    @Override
+    public Medication updateMedication(Long id, Medication medication) {
+        Medication existingMedication = getMedicationById(id);
+        if (existingMedication != null) {
+            existingMedication.setName(medication.getName());
+            return medicationRepository.save(existingMedication);
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteMedication(Long id) {
+        medicationRepository.deleteById(id);
+    }
+}
+```
+
+Remember to also create the necessary repositories (`PatientRepository`, `AppointmentRepository`, and `MedicationRepository`) as described earlier. This implementation provides constructor injection by using the `@Autowired` annotation in the service constructors to inject the required repositories.
+
+** I:
+Provide me controllers with implementing methods.
+
+** ChatGPT:
+Certainly! Here are the controllers with implemented methods for the healthcare management system:
+
+**1. PatientController:**
+
+```java
+@RestController
+@RequestMapping("/patients")
+public class PatientController {
+    private final PatientService patientService;
+
+    @Autowired
+    public PatientController(PatientService patientService) {
+        this.patientService = patientService;
+    }
+
+    @GetMapping
+    public List<Patient> getAllPatients() {
+        return patientService.getAllPatients();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
+        Patient patient = patientService.getPatientById(id);
+        if (patient != null) {
+            return ResponseEntity.ok(patient);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping
+    public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
+        Patient createdPatient = patientService.createPatient(patient);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdPatient);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Patient> updatePatient(@PathVariable Long id, @RequestBody Patient patient) {
+        Patient updatedPatient = patientService.updatePatient(id, patient);
+        if (updatedPatient != null) {
+            return ResponseEntity.ok(updatedPatient);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePatient(@PathVariable Long id) {
+        patientService.deletePatient(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{patientId}/medications/{medicationId}")
+    public ResponseEntity<Void> addMedicationToPatient(
+            @PathVariable Long patientId,
+            @PathVariable Long medicationId
+    ) {
+        patientService.addMedicationToPatient(patientId, medicationId);
+        return ResponseEntity.ok().build();
+    }
+}
+```
+
+**2. AppointmentController:**
+
+```java
+@RestController
+@RequestMapping("/appointments")
+public class AppointmentController {
+    private final AppointmentService appointmentService;
+
+    @Autowired
+    public AppointmentController(AppointmentService appointmentService) {
+        this.appointmentService = appointmentService;
+    }
+
+    @GetMapping
+    public List<Appointment> getAllAppointments() {
+        return appointmentService.getAllAppointments();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Appointment> getAppointmentById(@PathVariable Long id) {
+        Appointment appointment = appointmentService.getAppointmentById(id);
+        if (appointment != null) {
+            return ResponseEntity.ok(appointment);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping
+    public ResponseEntity<Appointment> createAppointment(@RequestBody Appointment appointment) {
+        Appointment createdAppointment = appointmentService.createAppointment(appointment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAppointment);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Appointment> updateAppointment(@PathVariable Long id, @RequestBody Appointment appointment) {
+        Appointment updatedAppointment = appointmentService.updateAppointment(id, appointment);
+        if (updatedAppointment != null) {
+            return ResponseEntity.ok(updatedAppointment);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteAppointment(@PathVariable Long id) {
+        appointmentService.deleteAppointment(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+```
+
+**3. MedicationController:**
+
+```java
+@RestController
+@RequestMapping("/medications")
+public class MedicationController {
+    private final MedicationService medicationService;
+
+    @Autowired
+    public MedicationController(MedicationService medicationService) {
+        this.medicationService = medicationService;
+    }
+
+    @GetMapping
+    public List<Medication> getAllMedications() {
+        return medicationService.getAllMedications();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Medication> getMedicationById(@PathVariable Long id) {
+        Medication medication = medicationService.getMedicationById(id);
+        if (medication != null) {
+            return ResponseEntity.ok(medication);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping
+    public ResponseEntity<Medication> createMedication(@RequestBody Medication medication) {
+        Medication createdMedication = medicationService.createMedication(medication);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdMedication);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Medication> updateMedication(@PathVariable Long id, @RequestBody Medication medication) {
+        Medication updatedMedication = medicationService.updateMedication(id, medication);
+        if (updatedMedication != null) {
+            return ResponseEntity.ok(updatedMedication);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMedication(@PathVariable Long id) {
+        medicationService.deleteMedication(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+```
+
+These controller classes define the REST endpoints for managing patient records, appointments, and medications as well as the ability to add medications to a patient. Each controller is injected with its respective service using constructor injection.
+
+** I:
+Provide me integration with google maps api.
+
+** ChatGPT:
+Integrating with the Google Maps API for providing directions to healthcare facilities involves making HTTP requests to the Google Maps Directions API. Here's how you can implement this integration in your Spring Boot application:
+
+**1. Get a Google Maps API Key:**
+
+Before you begin, you'll need to obtain an API key from the Google Cloud Console for the Maps JavaScript API. This key will be used to authenticate your requests to the Google Maps API.
+
+**2. Create a GoogleMapsService:**
+
+Create a service class that will handle the integration with the Google Maps API. Here's a simplified example:
+
+```java
+@Service
+public class GoogleMapsService {
+    private static final String GOOGLE_MAPS_API_BASE_URL = "https://maps.googleapis.com/maps/api/directions/json";
+
+    private final RestTemplate restTemplate;
+    private final String apiKey;  // Your Google Maps API Key
+
+    @Autowired
+    public GoogleMapsService(RestTemplateBuilder restTemplateBuilder, @Value("${google.maps.api.key}") String apiKey) {
+        this.restTemplate = restTemplateBuilder.build();
+        this.apiKey = apiKey;
+    }
+
+    public String getDirections(String origin, String destination) {
+        String url = GOOGLE_MAPS_API_BASE_URL +
+                "?origin=" + URLEncoder.encode(origin, StandardCharsets.UTF_8) +
+                "&destination=" + URLEncoder.encode(destination, StandardCharsets.UTF_8) +
+                "&key=" + apiKey;
+
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+        if (response.getStatusCode() == HttpStatus.OK) {
+            return response.getBody();
+        }
+
+        return null;
+    }
+}
+```
+
+**3. Configure API Key:**
+
+In your `application.properties` or `application.yml` file, provide the Google Maps API key:
+
+```properties
+google.maps.api.key=YOUR_GOOGLE_MAPS_API_KEY
+```
+
+**4. Controller Integration:**
+
+You can integrate the Google Maps service in your existing controllers by injecting `GoogleMapsService` and providing directions to the clients:
+
+```java
+@RestController
+@RequestMapping("/directions")
+public class DirectionsController {
+    private final GoogleMapsService googleMapsService;
+
+    @Autowired
+    public DirectionsController(GoogleMapsService googleMapsService) {
+        this.googleMapsService = googleMapsService;
+    }
+
+    @GetMapping
+    public ResponseEntity<String> getDirections(
+            @RequestParam String origin,
+            @RequestParam String destination
+    ) {
+        String directions = googleMapsService.getDirections(origin, destination);
+
+        if (directions != null) {
+            return ResponseEntity.ok(directions);
+        } else {
+            return ResponseEntity.badRequest().body("Error retrieving directions.");
+        }
+    }
+}
+```
+
+**5. Usage:**
+
+Clients can now make requests to your `/directions` endpoint with the `origin` and `destination` parameters to receive directions.
+
+Remember that this is a simplified example, and in a production environment, you might want to add more error handling, logging, and possibly parse the JSON response from the Google Maps API to extract relevant information.
+
+Additionally, make sure you have the necessary dependencies added to your project's `pom.xml` or `build.gradle` file to support the integration, including the `RestTemplate` dependency for making HTTP requests.
+
+** I:
+Provide me schema.sql and data.sql for H2 embedded database. Reflect "prescribedMedications" field.
+
+** ChatGPT:
+Certainly! Here's how you can create the schema and data SQL scripts for an H2 embedded database, reflecting the `prescribedMedications` field in the `Patient` entity.
+
+**1. schema.sql:**
+
+```sql
+CREATE TABLE patient (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE medication (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE appointment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    patient_id INT,
+    FOREIGN KEY (patient_id) REFERENCES patient(id)
+);
+
+CREATE TABLE patient_medication (
+    patient_id INT,
+    medication_id INT,
+    PRIMARY KEY (patient_id, medication_id),
+    FOREIGN KEY (patient_id) REFERENCES patient(id),
+    FOREIGN KEY (medication_id) REFERENCES medication(id)
+);
+```
+
+**2. data.sql:**
+
+```sql
+INSERT INTO patient (id, first_name, last_name) VALUES
+    (1, 'John', 'Doe'),
+    (2, 'Jane', 'Smith');
+
+INSERT INTO medication (id, name) VALUES
+    (1, 'Medication A'),
+    (2, 'Medication B'),
+    (3, 'Medication C');
+
+INSERT INTO appointment (id, date, patient_id) VALUES
+    (1, '2023-08-25', 1),
+    (2, '2023-08-26', 2);
+
+INSERT INTO patient_medication (patient_id, medication_id) VALUES
+    (1, 1),
+    (1, 2),
+    (2, 3);
+```
+
+In this schema, the `patient_medication` table represents a many-to-many relationship between patients and medications. Each patient can be associated with multiple medications, and each medication can be associated with multiple patients. The `prescribedMedications` field in the `Patient` entity corresponds to this relationship.
+
+Remember to adjust the data types and constraints based on your specific requirements. The scripts provided above are just examples and should be adapted to match your application's needs.
+
+** I:
+provide me configuration for this application. Include schema.sql and data.sql scripts for embeddable database.
+
+** ChatGPT:
+Sure, here's a sample configuration for your Spring Boot application, including the schema.sql and data.sql scripts for an H2 embedded database.
+
+**1. `application.properties` or `application.yml` for H2 Configuration:**
+
+```properties
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+# H2 Console configuration (optional)
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+```
+
+**2. `schema.sql`:**
+
+Create a file named `schema.sql` in the `src/main/resources` directory:
+
+```sql
+CREATE TABLE patient (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(255) NOT NULL,
+    last_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE medication (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE appointment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    patient_id INT,
+    FOREIGN KEY (patient_id) REFERENCES patient(id)
+);
+
+CREATE TABLE patient_medication (
+    patient_id INT,
+    medication_id INT,
+    PRIMARY KEY (patient_id, medication_id),
+    FOREIGN KEY (patient_id) REFERENCES patient(id),
+    FOREIGN KEY (medication_id) REFERENCES medication(id)
+);
+```
+
+**3. `data.sql`:**
+
+Create a file named `data.sql` in the `src/main/resources` directory:
+
+```sql
+INSERT INTO patient (id, first_name, last_name) VALUES
+    (1, 'John', 'Doe'),
+    (2, 'Jane', 'Smith');
+
+INSERT INTO medication (id, name) VALUES
+    (1, 'Medication A'),
+    (2, 'Medication B'),
+    (3, 'Medication C');
+
+INSERT INTO appointment (id, date, patient_id) VALUES
+    (1, '2023-08-25', 1),
+    (2, '2023-08-26', 2);
+
+INSERT INTO patient_medication (patient_id, medication_id) VALUES
+    (1, 1),
+    (1, 2),
+    (2, 3);
+```
+
+Make sure the `schema.sql` and `data.sql` files are placed in the `src/main/resources` directory of your project. These scripts will be automatically executed when the application starts up and connects to the H2 embedded database.
+
+With these configurations and scripts in place, your Spring Boot application will set up an H2 embedded database with the specified schema and data when it starts. You can access the H2 Console by navigating to `http://localhost:8080/h2-console` (assuming your application runs on port 8080). The H2 Console provides an interface to view and interact with the embedded database.
+
+** I:
+Provide me test cases for services separately for all methods.
+
+** ChatGPT:
+Sure, here are some sample test cases for the services, covering the CRUD operations and the `addMedicationToPatient` method for your healthcare management system:
+
+**1. PatientServiceTest:**
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class PatientServiceTest {
+
+    @Autowired
+    private PatientService patientService;
+
+    @Test
+    public void testCreatePatient() {
+        Patient patient = new Patient();
+        patient.setFirstName("John");
+        patient.setLastName("Doe");
+
+        Patient createdPatient = patientService.createPatient(patient);
+
+        assertNotNull(createdPatient.getId());
+        assertEquals("John", createdPatient.getFirstName());
+        assertEquals("Doe", createdPatient.getLastName());
+    }
+
+    @Test
+    public void testGetPatientById() {
+        // Assuming there is a patient with ID 1 in the database
+        Patient patient = patientService.getPatientById(1L);
+
+        assertNotNull(patient);
+        assertEquals(1L, patient.getId().longValue());
+    }
+
+    @Test
+    public void testUpdatePatient() {
+        // Assuming there is a patient with ID 2 in the database
+        Patient patient = patientService.getPatientById(2L);
+        patient.setFirstName("UpdatedFirstName");
+        patient.setLastName("UpdatedLastName");
+
+        Patient updatedPatient = patientService.updatePatient(2L, patient);
+
+        assertNotNull(updatedPatient);
+        assertEquals("UpdatedFirstName", updatedPatient.getFirstName());
+        assertEquals("UpdatedLastName", updatedPatient.getLastName());
+    }
+
+    @Test
+    public void testDeletePatient() {
+        // Assuming there is a patient with ID 3 in the database
+        patientService.deletePatient(3L);
+
+        assertNull(patientService.getPatientById(3L));
+    }
+
+    @Test
+    public void testAddMedicationToPatient() {
+        // Assuming there is a patient with ID 4 and medication with ID 5 in the database
+        Long patientId = 4L;
+        Long medicationId = 5L;
+
+        patientService.addMedicationToPatient(patientId, medicationId);
+
+        Patient patient = patientService.getPatientById(patientId);
+        assertNotNull(patient);
+        assertEquals(1, patient.getPrescribedMedications().size());
+        assertEquals(medicationId, patient.getPrescribedMedications().get(0).getId());
+    }
+}
+```
+
+**2. AppointmentServiceTest:**
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class AppointmentServiceTest {
+
+    @Autowired
+    private AppointmentService appointmentService;
+
+    @Test
+    public void testCreateAppointment() {
+        Appointment appointment = new Appointment();
+        appointment.setDate(LocalDate.of(2023, 8, 30));
+
+        Appointment createdAppointment = appointmentService.createAppointment(appointment);
+
+        assertNotNull(createdAppointment.getId());
+        assertEquals(LocalDate.of(2023, 8, 30), createdAppointment.getDate());
+    }
+
+    @Test
+    public void testGetAppointmentById() {
+        // Assuming there is an appointment with ID 1 in the database
+        Appointment appointment = appointmentService.getAppointmentById(1L);
+
+        assertNotNull(appointment);
+        assertEquals(1L, appointment.getId().longValue());
+    }
+
+    @Test
+    public void testUpdateAppointment() {
+        // Assuming there is an appointment with ID 2 in the database
+        Appointment appointment = appointmentService.getAppointmentById(2L);
+        appointment.setDate(LocalDate.of(2023, 9, 1));
+
+        Appointment updatedAppointment = appointmentService.updateAppointment(2L, appointment);
+
+        assertNotNull(updatedAppointment);
+        assertEquals(LocalDate.of(2023, 9, 1), updatedAppointment.getDate());
+    }
+
+    @Test
+    public void testDeleteAppointment() {
+        // Assuming there is an appointment with ID 3 in the database
+        appointmentService.deleteAppointment(3L);
+
+        assertNull(appointmentService.getAppointmentById(3L));
+    }
+}
+```
+
+**3. MedicationServiceTest:**
+
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest
+public class MedicationServiceTest {
+
+    @Autowired
+    private MedicationService medicationService;
+
+    @Test
+    public void testCreateMedication() {
+        Medication medication = new Medication();
+        medication.setName("Medication D");
+
+        Medication createdMedication = medicationService.createMedication(medication);
+
+        assertNotNull(createdMedication.getId());
+        assertEquals("Medication D", createdMedication.getName());
+    }
+
+    @Test
+    public void testGetMedicationById() {
+        // Assuming there is a medication with ID 4 in the database
+        Medication medication = medicationService.getMedicationById(4L);
+
+        assertNotNull(medication);
+        assertEquals(4L, medication.getId().longValue());
+    }
+
+    @Test
+    public void testUpdateMedication() {
+        // Assuming there is a medication with ID 5 in the database
+        Medication medication = medicationService.getMedicationById(5L);
+        medication.setName("UpdatedMedicationName");
+
+        Medication updatedMedication = medicationService.updateMedication(5L, medication);
+
+        assertNotNull(updatedMedication);
+        assertEquals("UpdatedMedicationName", updatedMedication.getName());
+    }
+
+    @Test
+    public void testDeleteMedication() {
+        // Assuming there is a medication with ID 6 in the database
+        medicationService.deleteMedication(6L);
+
+        assertNull(medicationService.getMedicationById(6L));
+    }
+}
+```
+
+These test cases cover various scenarios for the CRUD operations and the `addMedicationToPatient` method in your healthcare management system. Make sure you adjust the test data and assertions to match your specific database content and business logic.
+
+** I:
+Provide me data.sql for these tests.
+
+** ChatGPT:
+Certainly! Here's a `data.sql` script that you can use for your tests. This script populates the H2 embedded database with sample data for testing the service methods:
+
+```sql
+-- Insert sample patients
+INSERT INTO patient (id, first_name, last_name) VALUES
+    (1, 'John', 'Doe'),
+    (2, 'Jane', 'Smith'),
+    (3, 'Alice', 'Johnson');
+
+-- Insert sample medications
+INSERT INTO medication (id, name) VALUES
+    (1, 'Medication A'),
+    (2, 'Medication B'),
+    (3, 'Medication C'),
+    (4, 'Medication D'),
+    (5, 'Medication E');
+
+-- Insert sample appointments
+INSERT INTO appointment (id, date, patient_id) VALUES
+    (1, '2023-08-25', 1),
+    (2, '2023-08-26', 2),
+    (3, '2023-08-27', 1);
+
+-- Insert prescribed medications for patients
+INSERT INTO patient_medication (patient_id, medication_id) VALUES
+    (1, 1),
+    (1, 2),
+    (2, 3);
+```
+
+Make sure this `data.sql` file is placed in the `src/test/resources` directory of your project. When you run your tests, Spring Boot will automatically load and execute this script to populate the test database with the sample data. You can add more data as needed for additional test cases.
+
+** I:
+Provide me test cases for GoogleMapsServiceImpl.
+
+** ChatGPT:
+Certainly! Here are some sample test cases for the `GoogleMapsServiceImpl`, assuming you are using JUnit and Mockito for testing:
+
+```java
+@RunWith(MockitoJUnitRunner.class)
+public class GoogleMapsServiceImplTest {
+
+    @InjectMocks
+    private GoogleMapsServiceImpl googleMapsService;
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Test
+    public void testGetDirections_Success() {
+        // Mock the response from the Google Maps API
+        ResponseEntity<String> mockResponse = ResponseEntity.ok("Sample directions JSON response");
+        when(restTemplate.getForEntity(anyString(), eq(String.class))).thenReturn(mockResponse);
+
+        String origin = "123 Main St";
+        String destination = "456 Elm St";
+
+        String directions = googleMapsService.getDirections(origin, destination);
+
+        assertNotNull(directions);
+        assertEquals("Sample directions JSON response", directions);
+    }
+
+    @Test
+    public void testGetDirections_Error() {
+        // Mock an error response from the Google Maps API
+        ResponseEntity<String> mockErrorResponse = ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error message");
+        when(restTemplate.getForEntity(anyString(), eq(String.class))).thenReturn(mockErrorResponse);
+
+        String origin = "123 Main St";
+        String destination = "456 Elm St";
+
+        String directions = googleMapsService.getDirections(origin, destination);
+
+        assertNull(directions);
+    }
+}
+```
+
+In these test cases, we're using Mockito to mock the `RestTemplate` and simulate both successful and error responses from the Google Maps API. You can adjust the mock responses and test scenarios based on your specific needs. Make sure that your `GoogleMapsServiceImpl` class uses the `RestTemplate` to make HTTP requests to the Google Maps API, as shown in your previous code.
+
+Also, ensure that you've properly configured and injected the `GoogleMapsServiceImpl` and `RestTemplate` in your test context before running these tests.
+
+** I:
+Provide me test cases for PatientController. Use MockMvc
+
+** ChatGPT:
+Certainly! Here are some sample test cases for the `PatientController` using `MockMvc` to simulate HTTP requests and responses:
+
+```java
+@RunWith(SpringRunner.class)
+@WebMvcTest(PatientController.class)
+public class PatientControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private PatientService patientService;
+
+    @Test
+    public void testGetAllPatients() throws Exception {
+        List<Patient> patients = Arrays.asList(
+            new Patient(1L, "John", "Doe"),
+            new Patient(2L, "Jane", "Smith")
+        );
+
+        when(patientService.getAllPatients()).thenReturn(patients);
+
+        mockMvc.perform(get("/patients"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0].id", is(1)))
+            .andExpect(jsonPath("$[0].firstName", is("John")))
+            .andExpect(jsonPath("$[0].lastName", is("Doe")))
+            .andExpect(jsonPath("$[1].id", is(2)))
+            .andExpect(jsonPath("$[1].firstName", is("Jane")))
+            .andExpect(jsonPath("$[1].lastName", is("Smith")));
+    }
+
+    @Test
+    public void testGetPatientById() throws Exception {
+        Patient patient = new Patient(1L, "John", "Doe");
+
+        when(patientService.getPatientById(1L)).thenReturn(patient);
+
+        mockMvc.perform(get("/patients/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.firstName", is("John")))
+            .andExpect(jsonPath("$.lastName", is("Doe")));
+    }
+
+    @Test
+    public void testGetPatientById_NotFound() throws Exception {
+        when(patientService.getPatientById(1L)).thenReturn(null);
+
+        mockMvc.perform(get("/patients/1"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testCreatePatient() throws Exception {
+        Patient patient = new Patient(1L, "John", "Doe");
+
+        when(patientService.createPatient(any(Patient.class))).thenReturn(patient);
+
+        mockMvc.perform(post("/patients")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"firstName\":\"John\",\"lastName\":\"Doe\"}"))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.firstName", is("John")))
+            .andExpect(jsonPath("$.lastName", is("Doe")));
+    }
+
+    @Test
+    public void testUpdatePatient() throws Exception {
+        Patient updatedPatient = new Patient(1L, "UpdatedFirstName", "UpdatedLastName");
+
+        when(patientService.updatePatient(eq(1L), any(Patient.class))).thenReturn(updatedPatient);
+
+        mockMvc.perform(put("/patients/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"firstName\":\"UpdatedFirstName\",\"lastName\":\"UpdatedLastName\"}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.firstName", is("UpdatedFirstName")))
+            .andExpect(jsonPath("$.lastName", is("UpdatedLastName")));
+    }
+
+    @Test
+    public void testUpdatePatient_NotFound() throws Exception {
+        when(patientService.updatePatient(eq(1L), any(Patient.class))).thenReturn(null);
+
+        mockMvc.perform(put("/patients/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"firstName\":\"UpdatedFirstName\",\"lastName\":\"UpdatedLastName\"}"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDeletePatient() throws Exception {
+        mockMvc.perform(delete("/patients/1"))
+            .andExpect(status().isNoContent());
+    }
+}
+```
+
+In these test cases, we use `MockMvc` to perform various HTTP requests to the `PatientController` endpoints and then assert the expected responses using Hamcrest and JSONPath matchers. You can adapt these test cases to your specific requirements and modify the input data and expected outcomes accordingly.
+
+** I:
+Provide me test cases for AppointmentController. Use MockMvc
+
+** ChatGPT:
+Certainly! Here are some sample test cases for the `AppointmentController` using `MockMvc` to simulate HTTP requests and responses:
+
+```java
+@RunWith(SpringRunner.class)
+@WebMvcTest(AppointmentController.class)
+public class AppointmentControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private AppointmentService appointmentService;
+
+    @Test
+    public void testGetAllAppointments() throws Exception {
+        List<Appointment> appointments = Arrays.asList(
+            new Appointment(1L, LocalDate.of(2023, 8, 25), new Patient(1L, "John", "Doe")),
+            new Appointment(2L, LocalDate.of(2023, 8, 26), new Patient(2L, "Jane", "Smith"))
+        );
+
+        when(appointmentService.getAllAppointments()).thenReturn(appointments);
+
+        mockMvc.perform(get("/appointments"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0].id", is(1)))
+            .andExpect(jsonPath("$[0].date", is("2023-08-25")))
+            .andExpect(jsonPath("$[0].patient.id", is(1)))
+            .andExpect(jsonPath("$[0].patient.firstName", is("John")))
+            .andExpect(jsonPath("$[0].patient.lastName", is("Doe")))
+            .andExpect(jsonPath("$[1].id", is(2)))
+            .andExpect(jsonPath("$[1].date", is("2023-08-26")))
+            .andExpect(jsonPath("$[1].patient.id", is(2)))
+            .andExpect(jsonPath("$[1].patient.firstName", is("Jane")))
+            .andExpect(jsonPath("$[1].patient.lastName", is("Smith")));
+    }
+
+    @Test
+    public void testGetAppointmentById() throws Exception {
+        Appointment appointment = new Appointment(1L, LocalDate.of(2023, 8, 25), new Patient(1L, "John", "Doe"));
+
+        when(appointmentService.getAppointmentById(1L)).thenReturn(appointment);
+
+        mockMvc.perform(get("/appointments/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.date", is("2023-08-25")))
+            .andExpect(jsonPath("$.patient.id", is(1)))
+            .andExpect(jsonPath("$.patient.firstName", is("John")))
+            .andExpect(jsonPath("$.patient.lastName", is("Doe")));
+    }
+
+    @Test
+    public void testGetAppointmentById_NotFound() throws Exception {
+        when(appointmentService.getAppointmentById(1L)).thenReturn(null);
+
+        mockMvc.perform(get("/appointments/1"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testCreateAppointment() throws Exception {
+        Appointment appointment = new Appointment(1L, LocalDate.of(2023, 8, 25), new Patient(1L, "John", "Doe"));
+
+        when(appointmentService.createAppointment(any(Appointment.class))).thenReturn(appointment);
+
+        mockMvc.perform(post("/appointments")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"date\":\"2023-08-25\",\"patient\":{\"id\":1,\"firstName\":\"John\",\"lastName\":\"Doe\"}}"))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.date", is("2023-08-25")))
+            .andExpect(jsonPath("$.patient.id", is(1)))
+            .andExpect(jsonPath("$.patient.firstName", is("John")))
+            .andExpect(jsonPath("$.patient.lastName", is("Doe")));
+    }
+
+    @Test
+    public void testUpdateAppointment() throws Exception {
+        Appointment updatedAppointment = new Appointment(1L, LocalDate.of(2023, 8, 26), new Patient(1L, "UpdatedFirstName", "UpdatedLastName"));
+
+        when(appointmentService.updateAppointment(eq(1L), any(Appointment.class))).thenReturn(updatedAppointment);
+
+        mockMvc.perform(put("/appointments/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"date\":\"2023-08-26\",\"patient\":{\"id\":1,\"firstName\":\"UpdatedFirstName\",\"lastName\":\"UpdatedLastName\"}}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.date", is("2023-08-26")))
+            .andExpect(jsonPath("$.patient.id", is(1)))
+            .andExpect(jsonPath("$.patient.firstName", is("UpdatedFirstName")))
+            .andExpect(jsonPath("$.patient.lastName", is("UpdatedLastName")));
+    }
+
+    @Test
+    public void testUpdateAppointment_NotFound() throws Exception {
+        when(appointmentService.updateAppointment(eq(1L), any(Appointment.class))).thenReturn(null);
+
+        mockMvc.perform(put("/appointments/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"date\":\"2023-08-26\",\"patient\":{\"id\":1,\"firstName\":\"UpdatedFirstName\",\"lastName\":\"UpdatedLastName\"}}"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDeleteAppointment() throws Exception {
+        mockMvc.perform(delete("/appointments/1"))
+            .andExpect(status().isNoContent());
+    }
+}
+```
+
+These test cases use `MockMvc` to send HTTP requests to the `AppointmentController` endpoints and then assert the expected responses using Hamcrest and JSONPath matchers. You can adapt these test cases to your specific requirements and modify the input data and expected outcomes accordingly.
+
+** I:
+Provide me test cases for MedicationController. Use MockMvc
+
+** ChatGPT:
+Certainly! Here are some sample test cases for the `MedicationController` using `MockMvc` to simulate HTTP requests and responses:
+
+```java
+@RunWith(SpringRunner.class)
+@WebMvcTest(MedicationController.class)
+public class MedicationControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private MedicationService medicationService;
+
+    @Test
+    public void testGetAllMedications() throws Exception {
+        List<Medication> medications = Arrays.asList(
+            new Medication(1L, "Medication A"),
+            new Medication(2L, "Medication B")
+        );
+
+        when(medicationService.getAllMedications()).thenReturn(medications);
+
+        mockMvc.perform(get("/medications"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0].id", is(1)))
+            .andExpect(jsonPath("$[0].name", is("Medication A")))
+            .andExpect(jsonPath("$[1].id", is(2)))
+            .andExpect(jsonPath("$[1].name", is("Medication B")));
+    }
+
+    @Test
+    public void testGetMedicationById() throws Exception {
+        Medication medication = new Medication(1L, "Medication A");
+
+        when(medicationService.getMedicationById(1L)).thenReturn(medication);
+
+        mockMvc.perform(get("/medications/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.name", is("Medication A")));
+    }
+
+    @Test
+    public void testGetMedicationById_NotFound() throws Exception {
+        when(medicationService.getMedicationById(1L)).thenReturn(null);
+
+        mockMvc.perform(get("/medications/1"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testCreateMedication() throws Exception {
+        Medication medication = new Medication(1L, "Medication D");
+
+        when(medicationService.createMedication(any(Medication.class))).thenReturn(medication);
+
+        mockMvc.perform(post("/medications")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"name\":\"Medication D\"}"))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.name", is("Medication D")));
+    }
+
+    @Test
+    public void testUpdateMedication() throws Exception {
+        Medication updatedMedication = new Medication(1L, "UpdatedMedicationName");
+
+        when(medicationService.updateMedication(eq(1L), any(Medication.class))).thenReturn(updatedMedication);
+
+        mockMvc.perform(put("/medications/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"name\":\"UpdatedMedicationName\"}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.name", is("UpdatedMedicationName")));
+    }
+
+    @Test
+    public void testUpdateMedication_NotFound() throws Exception {
+        when(medicationService.updateMedication(eq(1L), any(Medication.class))).thenReturn(null);
+
+        mockMvc.perform(put("/medications/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"name\":\"UpdatedMedicationName\"}"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testDeleteMedication() throws Exception {
+        mockMvc.perform(delete("/medications/1"))
+            .andExpect(status().isNoContent());
+    }
+}
+```
+
+These test cases use `MockMvc` to send HTTP requests to the `MedicationController` endpoints and then assert the expected responses using Hamcrest and JSONPath matchers. You can adapt these test cases to your specific requirements and modify the input data and expected outcomes accordingly.
+
+** I:
+Provide me test cases for DirectionController. Use MockMvc
+
+** ChatGPT:
+@RunWith(SpringRunner.class)
+@WebMvcTest(DirectionController.class)
+public class DirectionControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private GoogleMapsService googleMapsService;
+
+    @Test
+    public void testGetDirections_Success() throws Exception {
+        String origin = "123 Main St";
+        String destination = "456 Elm St";
+        String sampleDirections = "Sample directions JSON response";
+
+        when(googleMapsService.getDirections(origin, destination)).thenReturn(sampleDirections);
+
+        mockMvc.perform(get("/directions")
+            .param("origin", origin)
+            .param("destination", destination))
+            .andExpect(status().isOk())
+            .andExpect(content().string(sampleDirections));
+    }
+
+    @Test
+    public void testGetDirections_Error() throws Exception {
+        String origin = "123 Main St";
+        String destination = "456 Elm St";
+
+        when(googleMapsService.getDirections(origin, destination)).thenReturn(null);
+
+        mockMvc.perform(get("/directions")
+            .param("origin", origin)
+            .param("destination", destination))
+            .andExpect(status().isBadRequest());
+    }
+}
+
+
+** I:
+Provide me Readme file where briefly describe this application and explain how to start it locally
+
+** ChatGPT:
+Certainly! Here's a sample `README.md` file for your healthcare management system application. You can customize it to fit your specific project details:
+
+```markdown
+# Healthcare Management System
+
+The Healthcare Management System is a Spring Boot application that allows healthcare providers to manage patient records, schedule appointments, prescribe medications, and provide directions to healthcare facilities using Google Maps integration.
+
+## Table of Contents
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [API Endpoints](#api-endpoints)
+- [Google Maps Integration](#google-maps-integration)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+- **Patient Management**: Create, update, and delete patient records. Associate patients with prescribed medications.
+
+- **Appointment Scheduling**: Create, update, and delete appointments for patients.
+
+- **Medication Management**: Manage a list of available medications.
+
+- **Google Maps Integration**: Get directions to healthcare facilities using Google Maps API.
+
+## Prerequisites
+
+Before you start, ensure you have the following prerequisites:
+
+- Java 8 or later installed.
+- Maven or Gradle for building the project.
+- [Google Maps API Key](https://developers.google.com/maps/gmp-get-started) for directions integration.
+- [H2 Database](https://www.h2database.com/html/main.html) for local development.
+
+## Getting Started
+
+1. Clone this repository to your local machine:
+
+   ```bash
+   git clone https://github.com/yourusername/healthcare-management-system.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd healthcare-management-system
+   ```
+
+3. Create a `src/main/resources/application.properties` file and add your Google Maps API Key:
+
+   ```properties
+   google.maps.api.key=YOUR_GOOGLE_MAPS_API_KEY
+   ```
+
+4. Build the project using Maven:
+
+   ```bash
+   mvn clean install
+   ```
+
+5. Start the application:
+
+   ```bash
+   java -jar target/healthcare-management-system-1.0.0.jar
+   ```
+
+The application will start on `http://localhost:8080`.
+
+## API Endpoints
+
+- **Patients**:
+  - `GET /patients`: Get a list of all patients.
+  - `GET /patients/{id}`: Get a patient by ID.
+  - `POST /patients`: Create a new patient.
+  - `PUT /patients/{id}`: Update an existing patient.
+  - `DELETE /patients/{id}`: Delete a patient.
+
+- **Appointments**:
+  - `GET /appointments`: Get a list of all appointments.
+  - `GET /appointments/{id}`: Get an appointment by ID.
+  - `POST /appointments`: Create a new appointment.
+  - `PUT /appointments/{id}`: Update an existing appointment.
+  - `DELETE /appointments/{id}`: Delete an appointment.
+
+- **Medications**:
+  - `GET /medications`: Get a list of all medications.
+  - `GET /medications/{id}`: Get a medication by ID.
+  - `POST /medications`: Create a new medication.
+  - `PUT /medications/{id}`: Update an existing medication.
+  - `DELETE /medications/{id}`: Delete a medication.
+
+- **Directions**:
+  - `GET /directions`: Get directions from Google Maps. Requires `origin` and `destination` query parameters.
+
+## Google Maps Integration
+
+The application integrates with Google Maps to provide directions to healthcare facilities. To use this feature, make sure you have configured your Google Maps API Key in `application.properties` as mentioned in the Prerequisites section.
+
+## Testing
+
+You can run the unit tests for the application using the following command:
+
+```bash
+mvn test
+```
+
+## Contributing
+
+Contributions are welcome! If you have any suggestions, bug reports, or feature requests, please create an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+```
+
+This README file provides a brief overview of your application, prerequisites, instructions for getting started, information on API endpoints, Google Maps integration, testing, and contributing. You should replace the placeholders like `YOUR_GOOGLE_MAPS_API_KEY` with your actual API key and update other sections with project-specific details.

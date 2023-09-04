@@ -49,6 +49,20 @@ jobs:
           path: |
             bookstore/target/site/jacoco/jacoco.csv
 
+      # Healthcare-mng
+      - name: Run Healthcare-mng build
+        run: |
+          cd healthcare-mng
+          mvn package
+
+      - name: Upload Healthcare-mng jacoco reports for subsequent jobs
+        uses: actions/upload-artifact@v3
+        with:
+          name: healthcare-mng-jacoco-report
+          retention-days: 1
+          path: |
+            healthcare-mng/target/site/jacoco/jacoco.csv
+
   generateBadges:
     name: Generate badges
     needs: "build"
@@ -78,6 +92,16 @@ jobs:
           jacoco-csv-file: jacoco.csv
           coverage-badge-filename: task1-md-coverage.svg
           coverage-label: "Bookstore coverage"
+      - name: Download healthcare-mng-jacoco-report
+        uses: actions/download-artifact@v3
+        with:
+          name: healthcare-mng-jacoco-report
+      - name: Generate healthcare-mng code coverage
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          jacoco-csv-file: jacoco.csv
+          coverage-badge-filename: task3-sr-coverage.svg
+          coverage-label: "Healthcare mng coverage"
       - name: Commit the badges
         run: |
           if [[ `git status --porcelain` ]]; then
